@@ -457,9 +457,9 @@ def main():
     # # 读取保存的 txt 文件
     # initial_planting_scheme = np.loadtxt('2022.txt', delimiter=',')
 
-    # 读取保存的 txt 文件
-    initial_planting_scheme_2 = np.loadtxt('2020.txt', delimiter=',')
-    initial_planting_scheme_2 = np.uint8(initial_planting_scheme_2)
+    # # 读取保存的 txt 文件
+    # initial_planting_scheme_2 = np.loadtxt('2020.txt', delimiter=',')
+    # initial_planting_scheme_2 = np.uint8(initial_planting_scheme_2)
 
     initial_planting_scheme = np.uint8(initial_planting_scheme)
 
@@ -545,21 +545,6 @@ def main():
     # 定义工具箱
     toolbox = base.Toolbox()
 
-    # import itertools
-    #
-    # def uniform_reference_points(nobj, divisions=4):
-    #     """Das and Dennis方法生成参考点"""
-    #     ref_dirs = []
-    #     for comb in itertools.combinations(range(divisions + nobj - 1), nobj - 1):
-    #         arr = np.array(comb)
-    #         arr = np.concatenate([arr, [divisions + nobj - 1]])
-    #         arr = arr[1:] - arr[:-1] - 1
-    #         arr = arr / divisions
-    #         ref_dirs.append(arr)
-    #     return np.array(ref_dirs)
-    #
-    # ref_points = uniform_reference_points(nobj=5, divisions=12)
-    #  ref_points=ref_points
     # 注册选择操作，并传入参考点
     toolbox.register("select", tools.selBest)
     toolbox.register("attr_int", random.randint, 1, len(CROPS))
@@ -781,10 +766,6 @@ def main():
                                    ngen=number_of_generations, m=m ,stats=stats, halloffame=hof,
                                    verbose=True)
 
-    # # 使用混合优化算法
-    # pop, log, hof = hybrid_ga_with_sa(pop, toolbox, ngen=number_of_generations, m = m, cxpb=crossover_probability, mutpb=mutation_probability, local_search_rate=0.3)
-
-
     # 可视化初始种植配置和最终种植配置
     initial_individual = pop[0]
     best_individual = hof[0]
@@ -805,101 +786,6 @@ def main():
     np.savetxt('2020.txt', best_individual, delimiter=',', fmt='%d')
     print("收益最大化、大豆种植面积最大化、连片种植最大化、轮作效益最大化:", evalCrops(best_individual, initial_planting_scheme,coords=coords,PROFITS=PROFITS,AREAS=AREAS,CROPS=CROPS,SOYBEAN_THRESHOLD=SOYBEAN_THRESHOLD,WEIGHT_ALPHA = WEIGHT_ALPHA,yes=True))
     print("收益最大化、大豆种植面积最大化、连片种植最大化、轮作效益最大化:", evalCrops(best_individual, initial_planting_scheme,coords=coords,PROFITS=PROFITS,AREAS=AREAS,CROPS=CROPS,SOYBEAN_THRESHOLD=SOYBEAN_THRESHOLD,WEIGHT_ALPHA = WEIGHT_ALPHA))
-
-    # import pickle  # 在代码开头添加该导入语句
-    #
-    # # 原代码结尾处，在可视化和打印语句之后添加以下保存逻辑
-    #
-    # # 保存 log（统计信息）
-    # with open('log.pkl', 'wb') as f:
-    #     pickle.dump(log, f)
-    # print("日志（log）已保存至 log.pkl")
-    #
-    # # 保存种群（pop）
-    # with open('pop.pkl', 'wb') as f:
-    #     pickle.dump(pop, f)
-    # print("种群（pop）已保存至 pop.pkl")
-    #
-    # # # 读取 log
-    # # with open('log.pkl', 'rb') as f:
-    # #     loaded_log = pickle.load(f)
-    # #
-    # #
-    # # # 读取 pop
-    # # with open('pop.pkl', 'rb') as f:
-    # #     loaded_pop = pickle.load(f)
-    #
-    #
-    #
-    #
-    # # ======================
-    # # 新增：种群稳定性分析
-    # # ======================
-    # from collections import namedtuple
-    #
-    # # 定义参数名称（每个地块对应一个参数，此处简化为作物类型索引）
-    # param_names = [f"Plot_{i + 1}" for i in range(num_plots)]
-    #
-    # # 提取种群数据
-    # final_population = pop
-    # best_individual = hof[0] if hof else pop[0]
-    # fitness_scores = np.array([ind.fitness.values[0] for ind in final_population])
-    # param_values = np.array([ind for ind in final_population])  # 个体的作物分配数组
-    #
-    # def calculate_genotype_entropy(individuals):
-    #     entropy = []
-    #     for col in range(individuals.shape[1]):
-    #         counts = np.bincount(individuals[:, col], minlength=4)  # 作物类型1-3，索引0为无效
-    #         probs = counts[1:] / len(individuals)  # 排除背景0
-    #         # 修正：计算每列的熵值并添加到列表
-    #         col_entropy = -np.sum(p * np.log2(p + 1e-10) for p in probs if p > 0)
-    #         entropy.append(col_entropy)
-    #     return np.mean(entropy)
-    #
-    # # 统计分析
-    # print("\n===================== 种群统计分析 =====================")
-    # print(f"最优解适应度: {best_individual.fitness.values[0]:.2f}")
-    # print(f"种群平均适应度: {np.mean(fitness_scores):.2f} ± {np.std(fitness_scores):.2f}")
-    # print(f"适应度变异系数: {np.std(fitness_scores) / np.mean(fitness_scores):.4f}")
-    #
-    # # 收敛性分析（最后10代适应度波动）
-    # if len(log.chapters["fitness"]) >= 5:
-    #     last_10_fitness = log.chapters["fitness"].select("max")[-10:]
-    #     convergence_std = np.std(last_10_fitness)
-    #     print(f"最后10代适应度波动: {convergence_std:.4f}")
-    #
-    # # 多样性分析（基因型熵）
-    # genotype_entropy = calculate_genotype_entropy(param_values)
-    # print(f"种群基因型熵: {genotype_entropy:.4f} (值越低表示越收敛)")
-    #
-    # # 绘制适应度分布直方图
-    # plt.figure(figsize=(8, 4))
-    # plt.hist(fitness_scores, bins=20, density=True, alpha=0.6, color='blue')
-    # plt.axvline(x=np.mean(fitness_scores), color='red', linestyle='--', label='均值')
-    # plt.axvline(x=best_individual.fitness.values[0], color='green', linestyle='--', label='最优解')
-    # plt.title('适应度分布')
-    # plt.xlabel('适应度值'), plt.ylabel('频率'), plt.legend()
-    # plt.grid(True), plt.tight_layout(), plt.show()
-    #
-    # # 绘制收敛曲线
-    # plt.figure(figsize=(12, 4))
-    # gen = log.select("gen")
-    # best_fitness = log.select("max")
-    # mean_fitness = log.select("avg")
-    #
-    # plt.subplot(1, 2, 1)
-    # print(gen)
-    # print(best_fitness)
-    # plt.plot(gen, best_fitness, label='最优适应度', color='red')
-    # plt.plot(gen, mean_fitness, label='平均适应度', color='blue')
-    # plt.title('进化收敛曲线')
-    # plt.xlabel('世代'), plt.ylabel('适应度'), plt.legend()
-    #
-    # plt.subplot(1, 2, 2)
-    # plt.plot(gen, np.array(best_fitness) - np.array(mean_fitness), color='purple')
-    # plt.title('最优解与均值差距')
-    # plt.xlabel('世代'), plt.ylabel('差值'), plt.grid(True)
-    # plt.tight_layout(), plt.show()
 
 
 if __name__ == "__main__":
